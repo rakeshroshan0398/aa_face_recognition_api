@@ -34,7 +34,6 @@ def api_root():
     Returns the JSON output.
     Args: HTTP post request with an image file specified to the key 'image'
     """
-    startTime = time.time()
     app.logger.info('Project_Home:' + PROJECT_HOME)
     if request.method == 'POST':
         #print(request.data)
@@ -45,9 +44,10 @@ def api_root():
         rgba_image = Image.open("test_images/test_32.png")
         rgb_image = rgba_image.convert('RGB')
         rgb_image.save("test_images/test.png")
-        resp = classifier_new.main(classifier_new.parse_arguments([])) 
+        startTime = time.time()
+        resp = classifier_new.main(classifier_new.parse_arguments([]))
+        resp['model_proc_time'] = time.time() - startTime;
         print(resp)
-        print("Processing time:" + str(time.time() - startTime) )
         return jsonify(resp)
     else:
     	return "Where is the image?"

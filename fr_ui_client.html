@@ -63,11 +63,8 @@
 //--------------------
 // GET USER MEDIA CODE
 //--------------------
-navigator.getUserMedia = ( navigator.getUserMedia ||
-  navigator.webkitGetUserMedia ||
-  navigator.mozGetUserMedia ||
-  navigator.msGetUserMedia
-);
+// navigator.mediaDevices.getUserMedia = ( navigator.mediaDevices.getUserMedia );
+
 
 var video;
 var webcamStream;
@@ -88,7 +85,8 @@ function snapshot() {
 
   imgData = canvas.toDataURL('image/png');
 
-  var url = 'http://127.0.0.1:5000/testpost';
+  // var url = 'http://127.0.0.1:5000/testpost';
+  var url = 'http://34.237.6.64:5000/testpost';
   var formData = imgData;
 
   var xhr = new XMLHttpRequest();
@@ -117,7 +115,7 @@ function snapshot() {
     }
   });
 
-  xhr.open("POST", "http://localhost:5000/testpost");
+  xhr.open("POST", url);
   xhr.setRequestHeader("cache-control", "no-cache", "no-cors");
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.send(formData);
@@ -154,32 +152,29 @@ function startFRProcess(firstTime){
 
 
 function startWebcam() {
-  if (navigator.getUserMedia) {
-    navigator.getUserMedia (
+  if (navigator.mediaDevices.getUserMedia) {
 
-      // constraints
-      {
+    video = document.querySelector('video');
+
+    if (navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({
         video: true,
         audio: false
-      },
-
-      // successCallback
-      function(localMediaStream) {
-        video = document.querySelector('video');
-        video.srcObject = localMediaStream;
-        webcamStream = localMediaStream;
-        console.log("Allowed webcam access!");
+      })
+      .then(function(stream) {
+        video.srcObject = stream;
+        console.log("Webcam accessed!");
         startFRProcess(true);
-      },
+      })
+      .catch(function(err0r) {
+        console.log("Something went wrong!");
+      });
+    }
 
-      // errorCallback
-      function(err) {
-        console.log("The following error occured: " + err);
-      }
-    );
-  } else {
-    console.log("getUserMedia not supported");
-  }
+} else {
+  console.log("navigator.mediaDevices.getUserMedia not supported");
+  alert("Your browser do not support media devices like webcam!");
+}
 }
 
 
